@@ -1,5 +1,10 @@
+import datetime
+import json
+import os
 import numpy as np
 import random
+import shutil
+import matplotlib.pyplot as plt
 
 
 def get_available_moves(board):
@@ -9,7 +14,8 @@ def get_available_moves(board):
 
 class Agent:
 
-    def __init__(self, state_size, action_size, random_seed=101011, lr=0.001, gamma=(0.01, 1.0), num_episodes=1):
+    def __init__(self, state_size, action_size, random_seed=101011, lr=0.01, gamma=(0.01, 1.0), num_episodes=10000,
+                 name="Agent"):
         """
         Instantiate the Agent Class
 
@@ -19,7 +25,7 @@ class Agent:
         :param lr: The learning rate
         :param gamma: The exploration exploitation balancing.
         """
-
+        self.name = name
         self.state_size = state_size
         self.action_size = action_size
         self.random_seed = random_seed
@@ -67,7 +73,7 @@ class Agent:
         # Update q-table
         for current_state, action, new_state in self.episode_memory:
             self.q_table[current_state, action] = self.q_table[current_state, action] + self.lr * (
-                        reward + max(self.q_table[new_state]) - self.q_table[current_state, action])
+                    reward + max(self.q_table[new_state]) - self.q_table[current_state, action])
 
         self.episode_memory = []
         self.current_episode += 1
@@ -89,13 +95,46 @@ class Agent:
             # If there hasn't been at least one tie and one win, the above code block will raise an exception.
             self.draw_probs.append(None)
             self.win_probs.append(None)
-
         self.sum_q_table.append(np.abs(self.q_table).sum())
 
     def print_metrics(self):
-        print("Episode: {}, Epsilon: {:.3f}, Win Probability: {:.3f}, Draw Probability: {:.3f}".format(
-            self.current_episode + 1, self.get_epsilon(), self.win_probs[-1], self.draw_probs[-1]))
+        print("Episode: {}, Epsilon: {:.3f}, Win Probability: {:.3f}, Draw Probability: {:.3f}, Q Sum: {:.3f}".format(
+            self.current_episode + 1, self.get_epsilon(), self.win_probs[-1], self.draw_probs[-1], self.sum_q_table[-1]))
 
+    def save(self, save_dir="../data/"):
 
+        save_dir = os.path.join(save_dir, f'{self.name}/')
 
+        if os.path.exists(save_dir):
+            shutil.rmtree(save_dir)
+        os.makedirs(save_dir)
 
+        with open(os.path.join(save_dir, 'training.json'), "w") as file_out:
+            json.dump({
+                "name": self.name,
+                "time": str(datetime.datetime.now()),
+                "lr": self.lr,
+                "gamma": f'{self.gamma[0]} - {self.gamma[1]}'
+            }, file_out)
+
+        np.save(os.path.join(save_dir, "q_table.npy"), self.q_table)
+        np.save(os.path.join(save_dir, "draw_probs.npy"), np.array(self.draw_probs), allow_pickle=True)
+        np.save(os.path.join(save_dir, "win_probs.npy"), np.array(self.win_probs), allow_pickle=True)
+        np.save(os.path.join(save_dir, "sum-q.npy"), np.array(self.sum_q_table))
+
+        fig = plt.figure(figsize=(15, 6))
+        plt.subplot(1, 2, 1)
+        plt.plot(self.draw_probs, label="Draw Probability")
+        plt.plot(self.win_probs, label="Win Probability")
+        plt.xlim(0, len(self.draw_probs) - 1)
+        plt.ylim(0, 100)
+        plt.xlabel("Episode")
+        plt.ylabel("Probability (%)")
+        plt.legend()
+        plt.subplot(1, 2, 2)
+        plt.plot(self.sum_q_table)
+        plt.xlim(0, len(self.sum_q_table) - 1)
+        plt.ylim(0, )
+        plt.xlabel("Episode")
+        plt.ylabel("$\sigma_(s, a) |Q(s, a)|$")
+        fig.savefig(os.path.join(save_dir, "performance.png"), dpi=fig.dpi)

@@ -2,14 +2,12 @@ from src.agent import Agent
 from src.environment import Environment
 
 
-def main():
-    num_episodes = 1000000
+def main(num_episodes=1, lr=0.01, gamma=(0.01, 1.0), name='Agent'):
 
-    agent = Agent(state_size=3, action_size=9, num_episodes=num_episodes)
+    agent = Agent(state_size=3, action_size=9, name=name, lr=lr, gamma=gamma)
     env = Environment(size=3)
 
     for episode in range(num_episodes):
-        episode_memory = []
         env.reset()
         state = env.get_state()['state']
         board = env.get_state()['board']
@@ -22,17 +20,24 @@ def main():
 
             next_state = env.get_state()['state']
 
-            episode_memory.append([state, action, next_state])
+            agent.step(state, action, next_state)
 
             state = next_state
 
         agent.update(env.get_state()['reward'])
 
-        if episode % 100000 == 0:
+        if episode % int(num_episodes/10) == 0:
             try:
                 agent.print_metrics()
             except:
                 pass
 
+    agent.save()
+
+
 if __name__ == "__main__":
-    main()
+    main(num_episodes=100000, lr=0.1, gamma=(0.01, 1.0), name='Agent1')
+    main(num_episodes=100000, lr=0.01, gamma=(0.01, 1.0), name='Agent2')
+    main(num_episodes=100000, lr=0.001, gamma=(0.01, 1.0), name='Agent3')
+    main(num_episodes=100000, lr=0.01, gamma=(0.5, 1.0), name='Agent4')
+    main(num_episodes=100000, lr=0.01, gamma=(0.001, 1.0), name='Agent5')
