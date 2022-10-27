@@ -36,8 +36,12 @@ def main(num_episodes=1, lr=0.01, gamma=(0.01, 1.0), name='Agent'):
 
 
 if __name__ == "__main__":
-    main(num_episodes=100000, lr=0.1, gamma=(0.01, 1.0), name='Agent1')
-    main(num_episodes=100000, lr=0.01, gamma=(0.01, 1.0), name='Agent2')
-    main(num_episodes=100000, lr=0.001, gamma=(0.01, 1.0), name='Agent3')
-    main(num_episodes=100000, lr=0.01, gamma=(0.5, 1.0), name='Agent4')
-    main(num_episodes=100000, lr=0.01, gamma=(0.001, 1.0), name='Agent5')
+    main(num_episodes=10000000, lr=0.1, gamma=(0.01, 1.0), name='Agent1')
+    main(num_episodes=10000000, lr=0.01, gamma=(0.01, 1.0), name='Agent2')
+    main(num_episodes=10000000, lr=0.001, gamma=(0.01, 1.0), name='Agent3')
+    main(num_episodes=10000000, lr=0.01, gamma=(0.5, 1.0), name='Agent4')
+    main(num_episodes=10000000, lr=0.01, gamma=(0.001, 1.0), name='Agent5')
+    main(num_episodes=10000000, lr=0.01, gamma=(0.9, 1.0), name='Agent6')
+    main(num_episodes=10000000, lr=0.01, gamma=(0.001, 0.01), name='Agent7')
+    main(num_episodes=10000000, lr=0.9, gamma=(0.01, 1.0), name='Agent8')
+

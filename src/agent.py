@@ -99,7 +99,8 @@ class Agent:
 
     def print_metrics(self):
         print("Episode: {}, Epsilon: {:.3f}, Win Probability: {:.3f}, Draw Probability: {:.3f}, Q Sum: {:.3f}".format(
-            self.current_episode + 1, self.get_epsilon(), self.win_probs[-1], self.draw_probs[-1], self.sum_q_table[-1]))
+            self.current_episode + 1, self.get_epsilon(), self.win_probs[-1], self.draw_probs[-1],
+            self.sum_q_table[-1]))
 
     def save(self, save_dir="../data/"):
 
@@ -138,3 +139,18 @@ class Agent:
         plt.xlabel("Episode")
         plt.ylabel("$\sigma_(s, a) |Q(s, a)|$")
         fig.savefig(os.path.join(save_dir, "performance.png"), dpi=fig.dpi)
+
+    def load(self, save_dir='../data/'):
+        save_dir = os.path.join(save_dir, f'{self.name}/')
+        self.q_table = np.load(os.path.join(save_dir, "q_table.npy"))
+
+    def perform(self, board, current_state, turn):
+        available_moves = get_available_moves(board)
+        actions = self.q_table[current_state] * turn
+        for action in np.argsort(actions)[::-1]:
+            action_square = [action // 3, action % 3]
+            if action_square in available_moves:
+                action_square = tuple(action_square)
+                break
+
+        return action, action_square
