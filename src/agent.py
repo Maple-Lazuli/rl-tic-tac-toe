@@ -104,7 +104,7 @@ class Agent:
             self.current_episode + 1, self.get_epsilon(), self.win_probs[-1], self.draw_probs[-1],
             self.sum_q_table[-1]))
 
-    def save(self, save_dir="../data/"):
+    def save(self, save_dir="./data/"):
 
         save_dir = os.path.join(save_dir, f'{self.name}/')
 
@@ -142,7 +142,7 @@ class Agent:
         plt.ylabel("$\sigma_(s, a) |Q(s, a)|$")
         fig.savefig(os.path.join(save_dir, "performance.png"), dpi=fig.dpi)
 
-    def load(self, save_dir='../data/'):
+    def load(self, save_dir='./data/'):
         save_dir = os.path.join(save_dir, f'{self.name}/')
         self.q_table = np.load(os.path.join(save_dir, "q_table.npy"))
 
