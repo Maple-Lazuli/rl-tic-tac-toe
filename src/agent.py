@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+from math import sqrt
 import numpy as np
 import random
 import shutil
@@ -14,7 +15,7 @@ def get_available_moves(board):
 
 class Agent:
 
-    def __init__(self, state_size, action_size, random_seed=101011, lr=0.01, gamma=(0.01, 1.0), num_episodes=10000,
+    def __init__(self, state_size, action_size, random_seed=101011, lr=0.01, epsilon=(0.01, 1.0), num_episodes=10000,
                  name="Agent"):
         """
         Instantiate the Agent Class
@@ -23,14 +24,15 @@ class Agent:
         :param action_size: Size of the action space
         :param random_seed: Seed for exploration
         :param lr: The learning rate
-        :param gamma: The exploration exploitation balancing.
+        :param epsilon: The exploration exploitation balancing.
         """
         self.name = name
         self.state_size = state_size
         self.action_size = action_size
+        self.action_size_base = int(sqrt(action_size))
         self.random_seed = random_seed
         self.lr = lr
-        self.gamma = gamma
+        self.epsilon = epsilon
         self.num_episodes = num_episodes
         self.current_episode = 0
         self.q_table = np.zeros((state_size ** action_size, action_size))
@@ -45,7 +47,7 @@ class Agent:
         np.random.seed(random_seed)
 
     def get_epsilon(self):
-        epsilon = max(self.gamma[0], min(self.gamma[1], self.num_episodes / (self.current_episode + 1)))
+        epsilon = max(self.epsilon[0], min(self.epsilon[1], self.num_episodes / (self.current_episode + 1)))
 
         return epsilon
 
@@ -55,11 +57,11 @@ class Agent:
         available_moves = get_available_moves(board)
         if np.random.random() < epsilon:
             action_square = tuple(random.choice(available_moves))
-            action = 3 * action_square[0] + action_square[1]
+            action = self.action_size_base * action_square[0] + action_square[1]
         else:
             actions = self.q_table[current_state] * turn
             for action in np.argsort(actions)[::-1]:
-                action_square = [action // 3, action % 3]
+                action_square = [action // self.action_size_base, action % self.action_size_base]
                 if action_square in available_moves:
                     action_square = tuple(action_square)
                     break
@@ -115,7 +117,7 @@ class Agent:
                 "name": self.name,
                 "time": str(datetime.datetime.now()),
                 "lr": self.lr,
-                "gamma": f'{self.gamma[0]} - {self.gamma[1]}'
+                "epsilon": f'{self.epsilon[0]} - {self.epsilon[1]}'
             }, file_out)
 
         np.save(os.path.join(save_dir, "q_table.npy"), self.q_table)
@@ -148,7 +150,7 @@ class Agent:
         available_moves = get_available_moves(board)
         actions = self.q_table[current_state] * turn
         for action in np.argsort(actions)[::-1]:
-            action_square = [action // 3, action % 3]
+            action_square = [action // self.action_size_base, action % self.action_size_base]
             if action_square in available_moves:
                 action_square = tuple(action_square)
                 break

@@ -39,8 +39,8 @@ class Environment:
         state = 0
 
         for x in self.board.flatten():
-            state += ((x + 1) / 3) * n_states
-            n_states /= 3
+            state += ((x + 1) / self.size) * n_states
+            n_states /= self.size
 
         return int(state)
 

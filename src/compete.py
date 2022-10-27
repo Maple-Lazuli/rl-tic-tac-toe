@@ -7,13 +7,13 @@ from src.agent import Agent
 from src.environment import Environment
 
 
-def compete(name1, name2, games=1001):
-    agent1 = Agent(3, 9, name=name1)
+def compete(name1, name2, games=1001, size=3):
+    agent1 = Agent(3, size**2, name=name1)
     agent1.load()
-    agent2 = Agent(3, 9, name=name2)
+    agent2 = Agent(3, size**2, name=name2)
     agent2.load()
 
-    env = Environment(size=3)
+    env = Environment(size=size)
 
     results = {
         'pos1': name1,
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--agent1', type=str,
                         default="Agent1",
-                        help="The name of the second agent")
+                        help="The name of the first agent")
 
     parser.add_argument('--agent2', type=str,
                         default="Agent2",
@@ -89,6 +89,10 @@ if __name__ == "__main__":
     parser.add_argument('--games', type=int,
                         default=1001,
                         help="The number of games to compete with")
+
+    parser.add_argument('--size', type=int,
+                        default=3,
+                        help="The size of the tic tac toe grid")
 
     flags, unparsed = parser.parse_known_args()
 
