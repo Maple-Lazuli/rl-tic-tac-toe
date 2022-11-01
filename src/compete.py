@@ -41,7 +41,7 @@ def compete(name1, name2, games=1001, size=3):
                 env.update(action_square)
             if env.get_state()['reward'] == 1:
                 results['pos1-wins'] += 1
-            else:
+            elif env.get_state()['reward'] == -1:
                 results['pos2-wins'] += 1
         else:
             # Agent 2 goes first
@@ -62,7 +62,7 @@ def compete(name1, name2, games=1001, size=3):
 
             if env.get_state()['reward'] == 1:
                 results['pos2-wins'] += 1
-            else:
+            elif env.get_state()['reward'] == -1:
                 results['pos1-wins'] += 1
 
         results['winner'] = name1 if results['pos1-wins'] > results['pos2-wins'] else name2
